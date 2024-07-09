@@ -2,14 +2,17 @@ package com.portfolioapp.portfolio.app.enitity;
 
 import com.portfolioapp.portfolio.app.security.Role;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
 @Getter
 @Setter
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class User {
 
     @Id
@@ -36,6 +39,10 @@ public class User {
 
     private boolean banned;
 
+    private boolean isSubscribed;
+
+    private LocalDateTime subscriptionExpiryDate;
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Project> projects;
 
@@ -44,4 +51,5 @@ public class User {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Comment> comments;
+
 }

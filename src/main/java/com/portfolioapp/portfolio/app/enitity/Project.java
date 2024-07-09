@@ -1,5 +1,6 @@
 package com.portfolioapp.portfolio.app.enitity;
 
+import com.portfolioapp.portfolio.app.security.ContentType;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -24,8 +25,9 @@ public class Project {
 
     private String description;
 
-    @Column(name = "media_files")
-    private String mediaFiles;
+    private ContentType contentType;
+
+    private String filePath;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;

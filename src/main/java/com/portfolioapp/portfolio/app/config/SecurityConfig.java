@@ -10,6 +10,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -36,7 +37,7 @@ public class SecurityConfig {
 
     private final UserDetailsService userDetailsService;
 
-    private String origin;
+    private String origin = "http://localhost:3000";
 
     @Autowired
     public SecurityConfig(UserDetailsService userDetailsService) {
@@ -52,9 +53,8 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http)throws Exception {
         http
 
-                .csrf(AbstractHttpConfigurer::disable
-
-                )
+                .csrf(AbstractHttpConfigurer::disable)
+                .cors(Customizer.withDefaults())
                 .exceptionHandling()
                 .authenticationEntryPoint(
                         (request, response, authException) -> response.sendError(
@@ -71,16 +71,17 @@ public class SecurityConfig {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/auth/**").permitAll()
-                        .requestMatchers("/test/**").permitAll()
+//                        .requestMatchers("/auth/**").permitAll()
+                        .requestMatchers("/auth/sign-up").permitAll()
+                        .requestMatchers("/auth/sign-in").permitAll()
                         .requestMatchers("/course/**").permitAll()
                         .requestMatchers("/category/**").permitAll()
+                        .requestMatchers("/test").authenticated()
                         .anyRequest().authenticated()
                 )
 
-                .authenticationProvider(authenticationProvider()).addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
-
-
+                .authenticationProvider(authenticationProvider())
+                .addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
 
