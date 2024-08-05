@@ -1,13 +1,22 @@
 package com.portfolioapp.portfolio.app.service;
 
-import com.portfolioapp.portfolio.app.dto.form.SignInForm;
-import com.portfolioapp.portfolio.app.dto.form.SignUpForm;
+import com.portfolioapp.portfolio.app.dto.form.*;
 import com.portfolioapp.portfolio.app.dto.view.UserView;
 import org.springframework.http.ResponseEntity;
 
+import java.io.IOException;
+
 public interface AuthenticationService {
 
-    String saveUser(SignUpForm form);
+    String saveUser(SignUpForm form) throws Exception;
 
     ResponseEntity<UserView> signIn(SignInForm form);
+
+    void resetPassword(ResetPasswordForm form);
+
+    ResponseEntity<Void> logoutUser();
+
+    void sendVerificationCode(SendVerificationCodeForm form);
+
+    void checkVerificationCode(CheckVerificationCodeForm form) throws Exception;
 }

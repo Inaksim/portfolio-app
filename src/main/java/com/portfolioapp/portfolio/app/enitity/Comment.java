@@ -1,7 +1,9 @@
 package com.portfolioapp.portfolio.app.enitity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
@@ -9,6 +11,8 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 @Setter
+@AllArgsConstructor
+@RequiredArgsConstructor
 public class Comment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,6 +31,12 @@ public class Comment {
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
+
+    public Comment(User user, Project project, String content) {
+        this.user = user;
+        this.project = project;
+        this.commentText = content;
+    }
 
     @PrePersist
     protected void onCreate() {

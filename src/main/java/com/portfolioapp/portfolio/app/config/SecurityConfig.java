@@ -71,12 +71,13 @@ public class SecurityConfig {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 .authorizeHttpRequests(authorize -> authorize
-//                        .requestMatchers("/auth/**").permitAll()
-                        .requestMatchers("/auth/sign-up").permitAll()
-                        .requestMatchers("/auth/sign-in").permitAll()
-                        .requestMatchers("/course/**").permitAll()
-                        .requestMatchers("/category/**").permitAll()
+                        .requestMatchers("/auth/**").permitAll()
+                        .requestMatchers("/img/**").authenticated()
                         .requestMatchers("/test").authenticated()
+                        .requestMatchers("/project/**").authenticated()
+                        .requestMatchers("/follow/**").authenticated()
+                        .requestMatchers("/like/**").authenticated()
+                        .requestMatchers("/comment/**").authenticated()
                         .anyRequest().authenticated()
                 )
 

@@ -1,16 +1,17 @@
 package com.portfolioapp.portfolio.app.dto.form;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.web.multipart.MultipartFile;
 
-@Data
-public class SignUpForm {
+@Getter
+@Setter
+public class UpdateUserForm {
+    private Long id;
     private String username;
     private String email;
-    private String password;
-    private MultipartFile avatar;
+    private String role;
     private String bio;
     private String socialLinks;
-
-
+    private MultipartFile avatar;
 }

@@ -37,6 +37,7 @@ public class User {
     @Enumerated(EnumType.STRING)
     private Role role;
 
+    private String verificationCode;
     private boolean banned;
 
     private boolean isSubscribed;
@@ -51,5 +52,13 @@ public class User {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Comment> comments;
+
+    @OneToMany(mappedBy = "followed", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Follower> followers;
+
+
+    @OneToMany(mappedBy = "follower", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Follower> following;
+
 
 }

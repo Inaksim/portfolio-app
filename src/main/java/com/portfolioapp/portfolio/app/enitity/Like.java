@@ -1,8 +1,7 @@
 package com.portfolioapp.portfolio.app.enitity;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
@@ -10,6 +9,8 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @Table(name="like_table")
+@AllArgsConstructor
+@NoArgsConstructor
 public class Like {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,6 +26,12 @@ public class Like {
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
+
+    public Like(User user, Project project) {
+        this.user = user;
+        this.project = project;
+    }
+
 
     @PrePersist
     protected void onCreate() {
