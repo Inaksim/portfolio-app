@@ -34,6 +34,11 @@ public class ProjectController {
         return projectService.getAllProjects(page, size, sortBy, asc);
     }
 
+    @GetMapping("/top")
+    public List<ProjectView> getTopProjects(  @RequestParam(defaultValue = "10") int limit) {
+        return projectService.getTopProjects(limit);
+    }
+
     @GetMapping("/my")
     public List<ProjectView> getMyProjects(Principal principal) {
         return projectService.getMyProjects(principal);

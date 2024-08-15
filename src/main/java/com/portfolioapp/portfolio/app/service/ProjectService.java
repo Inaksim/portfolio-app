@@ -33,4 +33,6 @@ public interface ProjectService {
     List<ProjectView> getProjectsByTag(String tagName);
 
     ProjectView getProjectById(Long projectId);
+
+    List<ProjectView> getTopProjects(int limit);
 }

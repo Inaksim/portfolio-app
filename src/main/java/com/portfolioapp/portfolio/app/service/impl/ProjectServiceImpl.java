@@ -19,7 +19,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import javax.swing.*;
+
 import java.io.IOException;
 import java.security.Principal;
 import java.time.LocalDateTime;
@@ -131,5 +131,19 @@ public class ProjectServiceImpl implements ProjectService {
     public ProjectView getProjectById(Long projectId) {
         Project project = projectRepository.getProjectById(projectId);
         return modelMapper.map(project, ProjectView.class);
+    }
+
+    @Override
+    public List<ProjectView> getTopProjects(int limit) {
+        List<Project> projects = projectRepository.findTopProjectsByLikes(limit);
+        return projects.stream()
+                .map(project -> new ProjectView(
+                        project.getId(),
+                        project.getTitle(),
+                        project.getDescription(),
+                        project.getFileName(),
+                        project.getUser().getUsername()
+                ))
+                .collect(Collectors.toList());
     }
 }
