@@ -1,6 +1,6 @@
 package com.portfolioapp.portfolio.app.service;
 
-import exception.ApplicationException;
+import com.portfolioapp.portfolio.app.exception.ApplicationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.core.AuthenticationException;

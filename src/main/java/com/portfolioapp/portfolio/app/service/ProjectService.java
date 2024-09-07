@@ -5,20 +5,18 @@ import com.portfolioapp.portfolio.app.dto.form.UpdateProjectForm;
 import com.portfolioapp.portfolio.app.dto.view.ProjectView;
 
 import com.portfolioapp.portfolio.app.enitity.Project;
-import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 
-import java.io.IOException;
 import java.security.Principal;
 import java.util.List;
 
 public interface ProjectService {
 
-    ResponseEntity<String> createProject(NewProjectForm form, Principal principal) throws IOException;
+    ResponseEntity<String> createProject(NewProjectForm form, Principal principal) throws Exception;
 
-    List<ProjectView> getAllProjects();
 
-    Page<Project> getAllProjects(int page, int size, String sortBy, boolean asc);
+
+    ResponseEntity<List<ProjectView>> getAllProjects(int page, int size, Principal principal);
 
     List<ProjectView> getMyProjects(Principal principal);
 
@@ -27,12 +25,16 @@ public interface ProjectService {
 
     ProjectView updateProject(UpdateProjectForm form, Principal principal);
 
-    List<ProjectView>searchProjects(String keyword);
+    List<ProjectView>searchProjects(String keyword, Principal principal);
 
 
-    List<ProjectView> getProjectsByTag(String tagName);
 
-    ProjectView getProjectById(Long projectId);
 
-    List<ProjectView> getTopProjects(int limit);
+    ProjectView getProjectById(Long projectId, Principal principal);
+
+    List<ProjectView> getTopProjects(int limit, Principal principal);
+
+    ProjectView convertToProjectView(Project project);
+
+    List<ProjectView> getProjectsByUserId(Long userId);
 }

@@ -78,6 +78,7 @@ public class SecurityConfig {
                         .requestMatchers("/follow/**").authenticated()
                         .requestMatchers("/like/**").authenticated()
                         .requestMatchers("/comment/**").authenticated()
+                        .requestMatchers("/image/**").authenticated()
                         .anyRequest().authenticated()
                 )
 

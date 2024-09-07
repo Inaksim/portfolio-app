@@ -9,7 +9,7 @@ import com.portfolioapp.portfolio.app.security.UserPrincipal;
 import com.portfolioapp.portfolio.app.security.jwt.JwtUtils;
 import com.portfolioapp.portfolio.app.service.AuthenticationService;
 import com.portfolioapp.portfolio.app.service.EmailService;
-import exception.ApplicationException;
+import com.portfolioapp.portfolio.app.exception.ApplicationException;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
@@ -24,11 +24,10 @@ import org.springframework.stereotype.Service;
 
 import static com.portfolioapp.portfolio.app.utils.Constraints.EMAIL;
 import static com.portfolioapp.portfolio.app.utils.Utils.generateVerificationCode;
-import static exception.Errors.*;
+import static com.portfolioapp.portfolio.app.exception.Errors.*;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -42,7 +41,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     private final JwtUtils jwtUtils;
 
-    private FileStorageServiceImpl fileStorageService;
+
 
     private EmailService emailService;
 
@@ -60,6 +59,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .username(form.getUsername())
                 .password(passwordEncoder.encode(form.getPassword()))
                 .role(Role.USER)
+                .firstName(form.getFirstName())
 //                .avatar(fileStorageService.storeFile(form.getAvatar()))
 //                .bio(form.getBio())
                 .banned(false)
@@ -101,7 +101,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Override
     public void resetPassword(ResetPasswordForm form) {
-        User user = userRepository.findByEmail(form.getEmail()).orElseThrow();
+        User user = userRepository.findByEmail(form.getEmail()).orElseThrow(() -> new ApplicationException(USER_NOT_FOUND_BY_EMAIL, Collections.singletonMap(EMAIL, form.getEmail())));
         user.setPassword(passwordEncoder.encode(form.getPassword()));
         userRepository.saveAndFlush(user);
     }

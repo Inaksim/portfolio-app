@@ -8,8 +8,9 @@ import lombok.Data;
 public class UpdateProjectForm {
     private Long id;
     private String title;
-    private String description;
-    private String contentType;
+    private String cover;
+    private String content;
+
 
 
 

@@ -1,4 +1,4 @@
-package exception;
+package com.portfolioapp.portfolio.app.exception;
 
 import org.springframework.http.HttpStatus;
 
@@ -17,7 +17,7 @@ public enum Errors implements ErrorResponse {
     UNAUTHORIZED("UNAUTHORIZED", HttpStatus.UNAUTHORIZED, "User is unauthorized"),
     SERVER_ERROR("SERVER_ERROR", HttpStatus.INTERNAL_SERVER_ERROR, "Something went wrong. Unexpected issue...");
 
-    ;
+
 
     final String key;
     final HttpStatus httpStatus;

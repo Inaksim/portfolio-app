@@ -4,8 +4,8 @@ import com.portfolioapp.portfolio.app.security.Role;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 @Entity
 @Getter
@@ -19,6 +19,9 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false, unique = false)
+    private String firstName;
+
     @Column(nullable = false, unique = true)
     private String username;
 
@@ -31,18 +34,20 @@ public class User {
     private String avatar;
     private String bio;
 
-    @Column(name = "social_links")
-    private String socialLinks;
+    @ElementCollection
+    @CollectionTable(name = "user_social_links", joinColumns = @JoinColumn(name = "user_id"))
+    @MapKeyColumn(name = "social_network")
+    @Column(name = "url")
+    private Map<String, String> socialLinks;
 
     @Enumerated(EnumType.STRING)
     private Role role;
 
     private String verificationCode;
+
     private boolean banned;
 
-    private boolean isSubscribed;
 
-    private LocalDateTime subscriptionExpiryDate;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Project> projects;
@@ -50,8 +55,6 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Like> likes;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Comment> comments;
 
     @OneToMany(mappedBy = "followed", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Follower> followers;

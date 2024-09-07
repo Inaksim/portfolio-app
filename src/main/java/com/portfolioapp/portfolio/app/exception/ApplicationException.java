@@ -1,4 +1,4 @@
-package exception;
+package com.portfolioapp.portfolio.app.exception;
 
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;

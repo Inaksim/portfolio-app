@@ -38,4 +38,10 @@ public class LikeController {
     public List<UserView> getLikesByProject(@PathVariable Long projectId) {
         return likeService.getLikesByProject(projectId);
     }
+
+    @GetMapping("/projects/{userId}")
+    public List<ProjectView> getLikedProjectsByUserId(@PathVariable Long userId) {
+        return likeService.getLikedProjectsByUserId(userId);
+    }
+
 }

@@ -6,7 +6,7 @@ import com.portfolioapp.portfolio.app.enitity.User;
 import com.portfolioapp.portfolio.app.repository.UserRepository;
 import com.portfolioapp.portfolio.app.security.Role;
 import com.portfolioapp.portfolio.app.service.UserService;
-import exception.ApplicationException;
+import com.portfolioapp.portfolio.app.exception.ApplicationException;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -17,8 +17,8 @@ import java.util.Collections;
 
 import static com.portfolioapp.portfolio.app.utils.Constraints.EMAIL;
 import static com.portfolioapp.portfolio.app.utils.Constraints.ID;
-import static exception.Errors.USER_NOT_FOUND;
-import static exception.Errors.USER_NOT_FOUND_BY_EMAIL;
+import static com.portfolioapp.portfolio.app.exception.Errors.USER_NOT_FOUND;
+import static com.portfolioapp.portfolio.app.exception.Errors.USER_NOT_FOUND_BY_EMAIL;
 
 @Service
 @AllArgsConstructor
@@ -28,29 +28,15 @@ public class UserServiceImpl implements UserService {
 
     private ModelMapper modelMapper;
 
-    private FileStorageServiceImpl fileStorageService;
 
 
-    @Override
-    public UserView getUserProfile(String username) {
-        User user = userRepository.findByEmail(username).orElseThrow(() -> new ApplicationException(USER_NOT_FOUND_BY_EMAIL, Collections.singletonMap(EMAIL, username)));
-        return UserView
-                .builder()
-                .id(user.getId())
-                .email(user.getEmail())
-                .username(user.getUsername())
-                .build();
-    }
+
+
 
     @Override
     public UserView getUserProfile(Principal principal) {
         User user = userRepository.findByEmail(principal.getName()).orElseThrow(() -> new ApplicationException(USER_NOT_FOUND_BY_EMAIL, Collections.singletonMap(EMAIL, principal.getName())));
-        return UserView
-                .builder()
-                .id(user.getId())
-                .email(user.getEmail())
-                .username(user.getUsername())
-                .build();
+        return convertToUserView(user);
     }
 
     @Override
@@ -59,10 +45,11 @@ public class UserServiceImpl implements UserService {
 
         user.setUsername(form.getUsername());
         user.setEmail(form.getEmail());
-        user.setRole(Role.valueOf(form.getRole()));
+        user.setRole(Role.USER);
+        user.setFirstName(form.getFirstName());
         user.setBio(form.getBio());
         user.setSocialLinks(form.getSocialLinks());
-        user.setAvatar(fileStorageService.storeFile(form.getAvatar()));
+        user.setAvatar(form.getAvatar());
 
         User result = userRepository.saveAndFlush(user);
         return modelMapper.map(result, UserView.class);
@@ -77,4 +64,34 @@ public class UserServiceImpl implements UserService {
     public User getUserById(Long id) {
         return userRepository.findById(id).orElseThrow();
     }
+    @Override
+    public UserView getUserView(Long id) {
+        User user = userRepository.findById(id).orElseThrow();
+       return convertToUserView(user);
+
+    }
+
+
+
+    @Override
+    public void removeUser(Long userId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new ApplicationException(USER_NOT_FOUND, Collections.singletonMap(ID, userId)));
+        userRepository.delete(user);
+    }
+
+    private UserView convertToUserView(User user) {
+        UserView userView = new UserView();
+        userView.setId(user.getId());
+        userView.setFirstName(user.getFirstName());
+        userView.setUsername(user.getUsername());
+        userView.setEmail(user.getEmail());
+        userView.setFollowingCount(user.getFollowing().size());
+        userView.setFollowersCount(user.getFollowers().size());
+        userView.setAvatar(user.getAvatar());
+        userView.setSocialLinks(user.getSocialLinks());
+        userView.setBio(user.getBio());
+        return userView;
+
+    }
+
 }

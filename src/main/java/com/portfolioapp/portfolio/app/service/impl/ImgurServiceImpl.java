@@ -1,17 +1,19 @@
 package com.portfolioapp.portfolio.app.service.impl;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.portfolioapp.portfolio.app.service.ImgurService;
-import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 
-import java.util.Base64;
+
 
 @Service
 public class ImgurServiceImpl implements ImgurService {
@@ -21,24 +23,29 @@ public class ImgurServiceImpl implements ImgurService {
 
     @Override
     public String uploadImage(MultipartFile file) throws Exception {
-        byte[] fileBytes = file.getBytes();
-        String encodedFile = Base64.getEncoder().encodeToString(fileBytes);
-
-        String uri = "https://api.imgur.com/3/image";
-
+        String url = "https://api.imgur.com/3/image";
         HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.MULTIPART_FORM_DATA);
         headers.set("Authorization", "Client-ID " + clientId);
 
-        var requestEntity = new org.springframework.http.HttpEntity<>(new JSONObject().put("image", encodedFile).toString(), headers);
+        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+        body.add("image", new ByteArrayResource(file.getBytes()) {
+            @Override
+            public String getFilename() {
+                return file.getOriginalFilename();
+            }
+        });
+
+        HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
         RestTemplate restTemplate = new RestTemplate();
+        ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
 
-        ResponseEntity<String> responseEntity = restTemplate.postForEntity(uri, requestEntity, String.class);
-
-        if (responseEntity.getStatusCode() == HttpStatus.OK) {
-            org.json.JSONObject response = new org.json.JSONObject(responseEntity.getBody());
-            return response.getJSONObject("data").getString("link");
+        if (response.getStatusCode() == HttpStatus.OK) {
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode root = objectMapper.readTree(response.getBody());
+            return root.path("data").path("link").asText();
         } else {
-            throw new RuntimeException("Failed to upload image to Imgur");
+            throw new Exception("Failed to upload image: " + response.getStatusCode());
         }
     }
 }

@@ -4,7 +4,7 @@ import com.portfolioapp.portfolio.app.dto.form.*;
 import com.portfolioapp.portfolio.app.dto.view.UserView;
 import org.springframework.http.ResponseEntity;
 
-import java.io.IOException;
+
 
 public interface AuthenticationService {
 

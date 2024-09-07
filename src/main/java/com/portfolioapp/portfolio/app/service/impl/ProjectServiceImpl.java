@@ -2,28 +2,26 @@ package com.portfolioapp.portfolio.app.service.impl;
 
 import com.portfolioapp.portfolio.app.dto.form.NewProjectForm;
 import com.portfolioapp.portfolio.app.dto.form.UpdateProjectForm;
+
+import com.portfolioapp.portfolio.app.dto.view.LikeView;
 import com.portfolioapp.portfolio.app.dto.view.ProjectView;
-import com.portfolioapp.portfolio.app.enitity.Project;
-import com.portfolioapp.portfolio.app.enitity.Tag;
-import com.portfolioapp.portfolio.app.enitity.User;
+import com.portfolioapp.portfolio.app.enitity.*;
 import com.portfolioapp.portfolio.app.repository.ProjectRepository;
-import com.portfolioapp.portfolio.app.repository.TagRepository;
+
 import com.portfolioapp.portfolio.app.repository.UserRepository;
-import com.portfolioapp.portfolio.app.service.FileStorageService;
+import com.portfolioapp.portfolio.app.service.ImgurService;
 import com.portfolioapp.portfolio.app.service.ProjectService;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-
-import java.io.IOException;
 import java.security.Principal;
 import java.time.LocalDateTime;
-import java.util.Collections;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -31,41 +29,37 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class ProjectServiceImpl implements ProjectService {
 
-   private FileStorageService fileStorageService;
+
    private UserRepository userRepository;
    private ProjectRepository projectRepository;
    private ModelMapper modelMapper;
-   private TagRepository tagRepository;
-    public ResponseEntity<String> createProject(NewProjectForm form, Principal principal) throws IOException {
-        String filePath = fileStorageService.storeFile(form.getFile());
+
+   private ImgurService imgurService;
+
+    public ResponseEntity<String> createProject(NewProjectForm form, Principal principal) throws Exception {
+        String cover = imgurService.uploadImage(form.getCover());
         Project project = new Project();
         project.setTitle(form.getTitle());
-        project.setDescription(form.getDescription());
-        project.setFileName(filePath);
+        project.setCover(cover);
         project.setUser(userRepository.findByEmail(principal.getName()).orElseThrow());
         project.setCreatedAt(LocalDateTime.now());
+        project.setContent(form.getContent());
+
+
+
         projectRepository.saveAndFlush(project);
         return ResponseEntity.ok("Created");
     }
 
 
-    public List<ProjectView> getAllProjects() {
-        List<Project> projects = projectRepository.findAll();
-        return projects.stream()
-                .map(project -> new ProjectView(
-                        project.getId(),
-                        project.getTitle(),
-                        project.getDescription(),
-                        project.getFileName(),
-                        project.getUser().getUsername()
-                ))
-                .collect(Collectors.toList());
-    }
-
     @Override
-    public Page<Project> getAllProjects(int page, int size, String sortBy, boolean asc) {
-        PageRequest pageRequest = PageRequest.of(page, size, asc ? Sort.Direction.ASC : Sort.Direction.DESC, sortBy);
-        return projectRepository.findAll(pageRequest);
+    public ResponseEntity<List<ProjectView>> getAllProjects(int page, int size, Principal principal) {
+        Pageable pageable = PageRequest.of(page -1, size);
+        Page<Project> projectsPage = projectRepository.findAll(pageable);
+        List<ProjectView> projectViews = projectsPage.getContent().stream()
+                .map(this::convertToProjectView)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(projectViews);
 
     }
 
@@ -73,15 +67,8 @@ public class ProjectServiceImpl implements ProjectService {
     public List<ProjectView> getMyProjects(Principal principal) {
         User user = userRepository.findByEmail(principal.getName()).orElseThrow();
         List<Project> projects = projectRepository.findProjectsByUser(user);
-
         return projects.stream()
-                .map(project -> new ProjectView(
-                        project.getId(),
-                        project.getTitle(),
-                        project.getDescription(),
-                        project.getFileName(),
-                        project.getUser().getUsername()
-                ))
+                .map(this::convertToProjectView)
                 .collect(Collectors.toList());
     }
 
@@ -104,7 +91,8 @@ public class ProjectServiceImpl implements ProjectService {
 
         if(project.getUser() == user) {
             project.setTitle(form.getTitle());
-            project.setDescription(form.getDescription());
+            project.setCover(form.getCover());
+            project.setContent(form.getContent());
             project.setUpdatedAt(LocalDateTime.now());
             Project result = projectRepository.saveAndFlush(project);
             return modelMapper.map(result, ProjectView.class);
@@ -115,35 +103,80 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public List<ProjectView> searchProjects(String keyword) {
-        List<Project> projects = projectRepository.findByTitleContainingIgnoreCaseOrDescriptionContainingIgnoreCase(keyword, keyword);
-        return Collections.singletonList(modelMapper.map(projects, ProjectView.class));
-    }
+    public List<ProjectView> searchProjects(String keyword, Principal principal) {
+        List<Project> projects = projectRepository.findByTitleContainingIgnoreCase(keyword);
 
-    @Override
-    public List<ProjectView> getProjectsByTag(String tagName) {
-        Tag tag =  tagRepository.findByName(tagName).orElseThrow();
-        List<Project> projects = tag.getProjects();
-        return Collections.singletonList(modelMapper.map(projects, ProjectView.class));
-    }
+        String username = principal.getName();
 
-    @Override
-    public ProjectView getProjectById(Long projectId) {
-        Project project = projectRepository.getProjectById(projectId);
-        return modelMapper.map(project, ProjectView.class);
-    }
-
-    @Override
-    public List<ProjectView> getTopProjects(int limit) {
-        List<Project> projects = projectRepository.findTopProjectsByLikes(limit);
         return projects.stream()
-                .map(project -> new ProjectView(
-                        project.getId(),
-                        project.getTitle(),
-                        project.getDescription(),
-                        project.getFileName(),
-                        project.getUser().getUsername()
-                ))
+                .map(project -> {
+                    ProjectView projectView = convertToProjectView(project);
+
+                    // Проверяем, лайкнул ли текущий пользователь проект
+                    boolean userHasLiked = project.getLikes().stream()
+                            .anyMatch(like -> like.getUser().getEmail().equals(username));
+
+                    projectView.setUserHasLiked(userHasLiked); // Устанавливаем значение в ProjectView
+                    return projectView;
+                })
+                .collect(Collectors.toList());
+    }
+
+
+
+    @Override
+    public ProjectView getProjectById(Long projectId, Principal principal) {
+        Project project = projectRepository.findProjectById(projectId);
+        ProjectView projectView = convertToProjectView(project);
+
+
+        boolean userHasLiked = project.getLikes().stream()
+                .anyMatch(like -> like.getUser().getEmail().equals(principal.getName()));
+
+        projectView.setUserHasLiked(userHasLiked);
+
+        return projectView;
+    }
+
+    @Override
+    public List<ProjectView> getTopProjects(int limit, Principal principal) {
+        Pageable pageable = PageRequest.of(0, limit);
+        Page<Project> projectsPage = projectRepository.findTopProjectsByLikes(pageable);
+        return projectsPage.getContent().stream()
+                .map(this::convertToProjectView)
+                .collect(Collectors.toList());
+
+    }
+
+    @Override
+    public ProjectView convertToProjectView(Project project) {
+        ProjectView projectView = new ProjectView();
+        projectView.setId(project.getId());
+        projectView.setTitle(project.getTitle());
+        projectView.setAuthorId(project.getUser().getId());
+        projectView.setCover(project.getCover());
+        projectView.setUsername(project.getUser().getUsername());
+        projectView.setContent(project.getContent());
+        projectView.setLikes(project.getLikes().stream().map(this::convertToLikeView).collect(Collectors.toList()));
+        projectView.setAuthorAvatar(project.getUser().getAvatar());
+        projectView.setUserHasLiked(false);
+
+
+
+        return projectView;
+    }
+
+    private LikeView convertToLikeView(Like like) {
+        return modelMapper.map(like, LikeView.class);
+    }
+
+
+
+    @Override
+    public List<ProjectView> getProjectsByUserId(Long userId) {
+        List<Project> projects = projectRepository.findProjectsByUserId(userId);
+        return  projects.stream()
+                .map(this::convertToProjectView)
                 .collect(Collectors.toList());
     }
 }

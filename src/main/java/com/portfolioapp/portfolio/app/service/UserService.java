@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.security.Principal;
 
 public interface UserService {
-    UserView getUserProfile(String username);
 
     UserView getUserProfile(Principal principal);
 
@@ -16,4 +15,8 @@ public interface UserService {
 
     User getUserByEmail(String email);
     User getUserById(Long id);
+
+    UserView getUserView(Long id);
+
+    void removeUser(Long userId);
 }

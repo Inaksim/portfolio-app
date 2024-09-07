@@ -2,7 +2,7 @@ package com.portfolioapp.portfolio.app.service.impl;
 
 import com.portfolioapp.portfolio.app.service.GlobalExceptionHandlerService;
 import com.portfolioapp.portfolio.app.utils.Constraints;
-import exception.ApplicationException;
+import com.portfolioapp.portfolio.app.exception.ApplicationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.web.error.ErrorAttributeOptions;
 import org.springframework.boot.web.servlet.error.DefaultErrorAttributes;
@@ -22,7 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static exception.Errors.*;
+import static com.portfolioapp.portfolio.app.exception.Errors.*;
 
 @Service
 @Slf4j

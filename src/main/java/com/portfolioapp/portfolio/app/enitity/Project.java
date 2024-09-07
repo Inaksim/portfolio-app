@@ -1,6 +1,5 @@
 package com.portfolioapp.portfolio.app.enitity;
 
-import com.portfolioapp.portfolio.app.security.ContentType;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -24,11 +23,10 @@ public class Project {
     @Column(nullable = false)
     private String title;
 
-    private String description;
+    private String cover;
 
-    private ContentType contentType;
-
-    private String fileName;
+    @Column(columnDefinition = "LONGTEXT")
+    private String content;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
@@ -38,19 +36,11 @@ public class Project {
 
 
 
-    @ManyToMany
-    @JoinTable(
-            name = "project_tags",
-            joinColumns = @JoinColumn(name = "project_id"),
-            inverseJoinColumns = @JoinColumn(name = "tag_id")
-    )
-    private List<Tag> tags;
+
 
     @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Like> likes;
 
-    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Comment> comments;
 
     @PrePersist
     protected void onCreate() {

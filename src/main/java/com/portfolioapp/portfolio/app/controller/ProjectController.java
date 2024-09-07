@@ -3,13 +3,13 @@ package com.portfolioapp.portfolio.app.controller;
 import com.portfolioapp.portfolio.app.dto.form.NewProjectForm;
 import com.portfolioapp.portfolio.app.dto.form.UpdateProjectForm;
 import com.portfolioapp.portfolio.app.dto.view.ProjectView;
-import com.portfolioapp.portfolio.app.enitity.Project;
+
 import lombok.AllArgsConstructor;
-import org.springframework.data.domain.Page;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.portfolioapp.portfolio.app.service.ProjectService;
-import java.io.IOException;
+
 import java.security.Principal;
 import java.util.List;
 
@@ -21,25 +21,24 @@ public class ProjectController {
     private ProjectService projectService;
 
     @PostMapping("/create")
-    public ResponseEntity<String> createProject(NewProjectForm form, Principal principal) throws IOException {
+    public ResponseEntity<String> createProject(NewProjectForm form, Principal principal) throws Exception {
         return projectService.createProject(form, principal);
     }
 
 
     @GetMapping("/all")
-    public Page<Project> getAllProjects( @RequestParam int page,
+    public ResponseEntity<List<ProjectView>> getAllProjects(@RequestParam int page,
                                              @RequestParam int size,
-                                             @RequestParam String sortBy,
-                                             @RequestParam boolean asc){
-        return projectService.getAllProjects(page, size, sortBy, asc);
+                                            Principal principal){
+        return projectService.getAllProjects(page, size, principal);
     }
 
     @GetMapping("/top")
-    public List<ProjectView> getTopProjects(  @RequestParam(defaultValue = "10") int limit) {
-        return projectService.getTopProjects(limit);
+    public List<ProjectView> getTopProjects( @RequestParam(defaultValue = "10") int limit, Principal principal) {
+        return projectService.getTopProjects(limit, principal);
     }
 
-    @GetMapping("/my")
+    @GetMapping("/get/my")
     public List<ProjectView> getMyProjects(Principal principal) {
         return projectService.getMyProjects(principal);
     }
@@ -55,18 +54,21 @@ public class ProjectController {
     }
 
     @GetMapping ("/search")
-    public List<ProjectView> searchProjects(@RequestParam String keyword) {
-        return projectService.searchProjects(keyword);
+    public List<ProjectView> searchProjects(@RequestParam String keyword, Principal principal) {
+        return projectService.searchProjects(keyword, principal);
     }
 
-    @GetMapping("/tag/{tagName}")
-    public List<ProjectView> getProjectsByTag(@PathVariable String tagName) {
-        return projectService.getProjectsByTag(tagName);
-    }
 
-    @GetMapping("/{projectId}")
-    public ProjectView getProject(@PathVariable Long projectId) {
-        return projectService.getProjectById(projectId);
+    @GetMapping("/get/{projectId}")
+    public ProjectView getProject(@PathVariable Long projectId, Principal principal) {
+        return projectService.getProjectById(projectId, principal);
 
     }
+    @GetMapping("/projects/{userId}")
+    public List<ProjectView> getProjectsByUserId(@PathVariable Long userId) {
+        return projectService.getProjectsByUserId(userId);
+    }
+
+
+
 }

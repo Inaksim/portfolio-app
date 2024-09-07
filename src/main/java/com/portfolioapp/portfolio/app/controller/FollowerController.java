@@ -48,4 +48,9 @@ public class FollowerController {
         return followService.getFollowingsList(principal);
 
     }
+
+    @GetMapping("/is-following/{userId}")
+    public boolean isFollowing(@PathVariable Long userId, Principal principal) {
+        return followService.isFollowing(userId, principal);
+    }
 }

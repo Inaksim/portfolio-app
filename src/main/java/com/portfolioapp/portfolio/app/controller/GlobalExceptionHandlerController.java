@@ -1,7 +1,7 @@
 package com.portfolioapp.portfolio.app.controller;
 
 import com.portfolioapp.portfolio.app.service.GlobalExceptionHandlerService;
-import exception.ApplicationException;
+import com.portfolioapp.portfolio.app.exception.ApplicationException;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;

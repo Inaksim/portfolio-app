@@ -4,6 +4,7 @@ import com.portfolioapp.portfolio.app.dto.view.UserView;
 import com.portfolioapp.portfolio.app.enitity.Follower;
 import com.portfolioapp.portfolio.app.enitity.User;
 import com.portfolioapp.portfolio.app.repository.FollowerRepository;
+import com.portfolioapp.portfolio.app.repository.UserRepository;
 import com.portfolioapp.portfolio.app.service.FollowService;
 import com.portfolioapp.portfolio.app.service.UserService;
 import lombok.AllArgsConstructor;
@@ -20,6 +21,7 @@ public class FollowServiceImpl implements FollowService {
 
     private FollowerRepository followerRepository;
     private UserService userService;
+    private UserRepository userRepository;
 
     @Override
     public void follow(Long userId, Principal principal) {
@@ -74,6 +76,11 @@ public class FollowServiceImpl implements FollowService {
         return ResponseEntity.ok(followerUsers);
     }
 
+    @Override
+    public boolean isFollowing(Long userId, Principal principal) {
+        User follower = userRepository.findByEmail(principal.getName()).orElseThrow();
+        User followed = userRepository.findById(userId).orElseThrow();
 
-
+        return followerRepository.existsByFollowerAndFollowed(follower, followed);
+    }
 }

@@ -17,4 +17,6 @@ public interface LikeService {
     List<ProjectView> getLikedProjects(Principal principal);
 
     List<UserView> getLikesByProject(Long projectId);
+
+    List<ProjectView> getLikedProjectsByUserId(Long userId);
 }

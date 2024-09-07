@@ -21,9 +21,19 @@ public class UserController {
         return userService.updateUser(form);
     }
 
-    @GetMapping("/me")
+    @GetMapping("/profile/me")
     public UserView myProfile(Principal principal) {
         return userService.getUserProfile(principal);
+    }
+
+    @DeleteMapping("/delete/{userId}")
+    public void deleteUser(@PathVariable Long userId) {
+         userService.removeUser(userId);
+    }
+
+    @GetMapping("/{userId}")
+    public UserView getUser(@PathVariable long userId) {
+         return userService.getUserView(userId);
     }
 
 
