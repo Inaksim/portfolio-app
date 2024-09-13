@@ -9,7 +9,6 @@ import com.portfolioapp.portfolio.app.repository.LikeRepository;
 import com.portfolioapp.portfolio.app.repository.ProjectRepository;
 import com.portfolioapp.portfolio.app.repository.UserRepository;
 import com.portfolioapp.portfolio.app.service.LikeService;
-import com.portfolioapp.portfolio.app.service.ProjectService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -25,7 +24,7 @@ public class LikeServiceImpl implements LikeService {
     private LikeRepository likeRepository;
     private UserRepository userRepository;
     private ProjectRepository projectRepository;
-    private ProjectService projectService;
+
 
     @Override
     public ResponseEntity<?> likeProject(Long projectId, Principal principal) {
@@ -56,7 +55,7 @@ public class LikeServiceImpl implements LikeService {
         User user = userRepository.findByEmail(principal.getName()).orElseThrow();
         List<Like> likes = likeRepository.getLikesByUser(user);
         return likes.stream()
-                .map(like -> projectService.convertToProjectView(like.getProject()))
+                .map(like -> new ProjectView(like.getProject()))
                 .collect(Collectors.toList());
     }
 
@@ -73,7 +72,7 @@ public class LikeServiceImpl implements LikeService {
     public List<ProjectView> getLikedProjectsByUserId(Long userId) {
         List<Like> likes = likeRepository.findByUserId(userId);
         return likes.stream()
-                .map(like -> projectService.convertToProjectView(like.getProject()))
+                .map(like -> new ProjectView(like.getProject()))
                 .collect(Collectors.toList());
 
     }
