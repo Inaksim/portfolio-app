@@ -14,13 +14,13 @@ import java.security.Principal;
 @RequestMapping("/profile")
 @AllArgsConstructor
 public class UserController {
+
     private UserService userService;
 
     @PutMapping("/update")
     public UserView updateUser(@RequestBody UpdateUserForm form) throws IOException {
         return userService.updateUser(form);
     }
-
     @GetMapping("/profile/me")
     public UserView myProfile(Principal principal) {
         return userService.getUserProfile(principal);
@@ -35,6 +35,5 @@ public class UserController {
     public UserView getUser(@PathVariable long userId) {
          return userService.getUserView(userId);
     }
-
 
 }

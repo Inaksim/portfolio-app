@@ -60,11 +60,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .password(passwordEncoder.encode(form.getPassword()))
                 .role(Role.USER)
                 .firstName(form.getFirstName())
-//                .avatar(fileStorageService.storeFile(form.getAvatar()))
-//                .bio(form.getBio())
                 .banned(false)
                 .verificationCode(String.valueOf(code))
-//                .socialLinks(form.getSocialLinks())
                 .build();
 
 
@@ -93,7 +90,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .id(userPrincipal.getId())
                 .email(userPrincipal.getUsername())
                 .username(userPrincipal.getUser_name())
-                .role(roles.get(0))
+                .role(roles.getFirst())
                 .build();
 
         return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, jwtCookie.toString()).body(userView);
@@ -103,6 +100,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     public void resetPassword(ResetPasswordForm form) {
         User user = userRepository.findByEmail(form.getEmail()).orElseThrow(() -> new ApplicationException(USER_NOT_FOUND_BY_EMAIL, Collections.singletonMap(EMAIL, form.getEmail())));
         user.setPassword(passwordEncoder.encode(form.getPassword()));
+        user.setVerificationCode(form.getVerificationCode());
         userRepository.saveAndFlush(user);
     }
 

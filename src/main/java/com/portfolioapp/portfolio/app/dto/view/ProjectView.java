@@ -3,6 +3,7 @@ package com.portfolioapp.portfolio.app.dto.view;
 
 
 
+import com.portfolioapp.portfolio.app.enitity.Project;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -10,6 +11,7 @@ import lombok.Setter;
 
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 @AllArgsConstructor
@@ -29,8 +31,15 @@ public class ProjectView {
     public ProjectView() {
 
     }
-
-
-
+    public ProjectView(Project project) {
+        this.id = project.getId();
+        this.title = project.getTitle();
+        this.cover = project.getCover();
+        this.username = project.getUser().getUsername();
+        this.authorId = project.getUser().getId();
+        this.content = project.getContent();
+        this.likes = project.getLikes().stream().map(LikeView::new).collect(Collectors.toList());
+        this.userHasLiked = false;
+    }
 
 }

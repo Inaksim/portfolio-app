@@ -1,6 +1,7 @@
 package com.portfolioapp.portfolio.app.dto.view;
 
 import com.portfolioapp.portfolio.app.enitity.User;
+import com.portfolioapp.portfolio.app.security.Role;
 import lombok.*;
 
 import java.util.Map;
@@ -19,13 +20,18 @@ public class UserView {
     private int followersCount;
     private int followingCount;
     private String bio;
-
+    public UserView(){}
 
     public UserView(User user) {
         this.id = user.getId();
+        this.firstName = user.getFirstName();
         this.username = user.getUsername();
         this.email = user.getEmail();
+        this.role = Role.USER.toString();
+        this.avatar = user.getAvatar();
+        this.socialLinks = user.getSocialLinks();
+        this.followersCount = user.getFollowers().size();
+        this.followingCount = user.getFollowing().size();
+        this.bio = user.getBio();
     }
-
-    public UserView( ){}
 }

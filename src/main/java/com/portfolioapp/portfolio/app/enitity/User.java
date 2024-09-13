@@ -42,23 +42,16 @@ public class User {
 
     @Enumerated(EnumType.STRING)
     private Role role;
-
     private String verificationCode;
-
     private boolean banned;
-
-
-
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Project> projects;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Like> likes;
 
-
     @OneToMany(mappedBy = "followed", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Follower> followers;
-
 
     @OneToMany(mappedBy = "follower", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Follower> following;

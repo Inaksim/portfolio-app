@@ -14,12 +14,9 @@ public interface ProjectService {
 
     ResponseEntity<String> createProject(NewProjectForm form, Principal principal) throws Exception;
 
-
-
     ResponseEntity<List<ProjectView>> getAllProjects(int page, int size, Principal principal);
 
     List<ProjectView> getMyProjects(Principal principal);
-
 
     ResponseEntity<String> deleteProject(Long projectId, Principal principal);
 
@@ -27,14 +24,9 @@ public interface ProjectService {
 
     List<ProjectView>searchProjects(String keyword, Principal principal);
 
-
-
-
     ProjectView getProjectById(Long projectId, Principal principal);
 
     List<ProjectView> getTopProjects(int limit, Principal principal);
-
-    ProjectView convertToProjectView(Project project);
 
     List<ProjectView> getProjectsByUserId(Long userId);
 }

@@ -27,21 +27,17 @@ public class UserServiceImpl implements UserService {
     private UserRepository userRepository;
 
     private ModelMapper modelMapper;
-
-
-
-
-
-
     @Override
     public UserView getUserProfile(Principal principal) {
-        User user = userRepository.findByEmail(principal.getName()).orElseThrow(() -> new ApplicationException(USER_NOT_FOUND_BY_EMAIL, Collections.singletonMap(EMAIL, principal.getName())));
-        return convertToUserView(user);
+        User user = userRepository.findByEmail(principal.getName()).orElseThrow(
+                () -> new ApplicationException(USER_NOT_FOUND_BY_EMAIL, Collections.singletonMap(EMAIL, principal.getName())));
+        return new UserView(user);
     }
 
     @Override
-    public UserView updateUser(UpdateUserForm form) throws IOException {
-        User user = userRepository.findById(form.getId()).orElseThrow(() -> new ApplicationException(USER_NOT_FOUND, Collections.singletonMap(ID, form.getId())));
+    public UserView updateUser(UpdateUserForm form) {
+        User user = userRepository.findById(form.getId()).orElseThrow(
+                () -> new ApplicationException(USER_NOT_FOUND, Collections.singletonMap(ID, form.getId())));
 
         user.setUsername(form.getUsername());
         user.setEmail(form.getEmail());
@@ -57,41 +53,28 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User getUserByEmail(String email) {
-        return userRepository.findByEmail(email).orElseThrow();
+        return userRepository.findByEmail(email).orElseThrow(
+                () -> new ApplicationException(USER_NOT_FOUND_BY_EMAIL, Collections.singletonMap(EMAIL, email)));
     }
 
     @Override
     public User getUserById(Long id) {
-        return userRepository.findById(id).orElseThrow();
+        return userRepository.findById(id).orElseThrow(
+                () -> new ApplicationException(USER_NOT_FOUND_BY_EMAIL, Collections.singletonMap(ID, id)));
     }
     @Override
     public UserView getUserView(Long id) {
-        User user = userRepository.findById(id).orElseThrow();
-       return convertToUserView(user);
+        User user = userRepository.findById(id).orElseThrow(
+                () -> new ApplicationException(USER_NOT_FOUND_BY_EMAIL, Collections.singletonMap(ID, id)));
+       return new UserView(user);
 
     }
-
-
 
     @Override
     public void removeUser(Long userId) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new ApplicationException(USER_NOT_FOUND, Collections.singletonMap(ID, userId)));
+        User user = userRepository.findById(userId).orElseThrow(
+                () -> new ApplicationException(USER_NOT_FOUND, Collections.singletonMap(ID, userId)));
         userRepository.delete(user);
-    }
-
-    private UserView convertToUserView(User user) {
-        UserView userView = new UserView();
-        userView.setId(user.getId());
-        userView.setFirstName(user.getFirstName());
-        userView.setUsername(user.getUsername());
-        userView.setEmail(user.getEmail());
-        userView.setFollowingCount(user.getFollowing().size());
-        userView.setFollowersCount(user.getFollowers().size());
-        userView.setAvatar(user.getAvatar());
-        userView.setSocialLinks(user.getSocialLinks());
-        userView.setBio(user.getBio());
-        return userView;
-
     }
 
 }

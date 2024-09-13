@@ -44,9 +44,6 @@ public class ProjectServiceImpl implements ProjectService {
         project.setUser(userRepository.findByEmail(principal.getName()).orElseThrow());
         project.setCreatedAt(LocalDateTime.now());
         project.setContent(form.getContent());
-
-
-
         projectRepository.saveAndFlush(project);
         return ResponseEntity.ok("Created");
     }
@@ -57,7 +54,7 @@ public class ProjectServiceImpl implements ProjectService {
         Pageable pageable = PageRequest.of(page -1, size);
         Page<Project> projectsPage = projectRepository.findAll(pageable);
         List<ProjectView> projectViews = projectsPage.getContent().stream()
-                .map(this::convertToProjectView)
+                .map(ProjectView::new)
                 .collect(Collectors.toList());
         return ResponseEntity.ok(projectViews);
 
@@ -68,7 +65,7 @@ public class ProjectServiceImpl implements ProjectService {
         User user = userRepository.findByEmail(principal.getName()).orElseThrow();
         List<Project> projects = projectRepository.findProjectsByUser(user);
         return projects.stream()
-                .map(this::convertToProjectView)
+                .map(ProjectView::new)
                 .collect(Collectors.toList());
     }
 
@@ -110,13 +107,12 @@ public class ProjectServiceImpl implements ProjectService {
 
         return projects.stream()
                 .map(project -> {
-                    ProjectView projectView = convertToProjectView(project);
+                    ProjectView projectView = new ProjectView(project);
 
-                    // Проверяем, лайкнул ли текущий пользователь проект
                     boolean userHasLiked = project.getLikes().stream()
                             .anyMatch(like -> like.getUser().getEmail().equals(username));
 
-                    projectView.setUserHasLiked(userHasLiked); // Устанавливаем значение в ProjectView
+                    projectView.setUserHasLiked(userHasLiked);
                     return projectView;
                 })
                 .collect(Collectors.toList());
@@ -127,7 +123,7 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     public ProjectView getProjectById(Long projectId, Principal principal) {
         Project project = projectRepository.findProjectById(projectId);
-        ProjectView projectView = convertToProjectView(project);
+        ProjectView projectView = new ProjectView(project);
 
 
         boolean userHasLiked = project.getLikes().stream()
@@ -143,40 +139,16 @@ public class ProjectServiceImpl implements ProjectService {
         Pageable pageable = PageRequest.of(0, limit);
         Page<Project> projectsPage = projectRepository.findTopProjectsByLikes(pageable);
         return projectsPage.getContent().stream()
-                .map(this::convertToProjectView)
+                .map(ProjectView::new)
                 .collect(Collectors.toList());
 
     }
 
     @Override
-    public ProjectView convertToProjectView(Project project) {
-        ProjectView projectView = new ProjectView();
-        projectView.setId(project.getId());
-        projectView.setTitle(project.getTitle());
-        projectView.setAuthorId(project.getUser().getId());
-        projectView.setCover(project.getCover());
-        projectView.setUsername(project.getUser().getUsername());
-        projectView.setContent(project.getContent());
-        projectView.setLikes(project.getLikes().stream().map(this::convertToLikeView).collect(Collectors.toList()));
-        projectView.setAuthorAvatar(project.getUser().getAvatar());
-        projectView.setUserHasLiked(false);
-
-
-
-        return projectView;
-    }
-
-    private LikeView convertToLikeView(Like like) {
-        return modelMapper.map(like, LikeView.class);
-    }
-
-
-
-    @Override
     public List<ProjectView> getProjectsByUserId(Long userId) {
         List<Project> projects = projectRepository.findProjectsByUserId(userId);
         return  projects.stream()
-                .map(this::convertToProjectView)
+                .map(ProjectView::new)
                 .collect(Collectors.toList());
     }
 }

@@ -15,14 +15,7 @@ import java.util.List;
 @RequestMapping("/follow")
 public class FollowerController {
 
-
-
    private FollowService followService;
-
-
-    /*
-    userId - user you want to subscribe to
-     */
 
     @PostMapping("/new-follow/{userId}")
     public String follow(@PathVariable Long userId, Principal principal) {

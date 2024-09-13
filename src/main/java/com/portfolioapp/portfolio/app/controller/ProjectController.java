@@ -27,8 +27,7 @@ public class ProjectController {
 
 
     @GetMapping("/all")
-    public ResponseEntity<List<ProjectView>> getAllProjects(@RequestParam int page,
-                                             @RequestParam int size,
+    public ResponseEntity<List<ProjectView>> getAllProjects(@RequestParam int page, @RequestParam int size,
                                             Principal principal){
         return projectService.getAllProjects(page, size, principal);
     }
@@ -68,7 +67,5 @@ public class ProjectController {
     public List<ProjectView> getProjectsByUserId(@PathVariable Long userId) {
         return projectService.getProjectsByUserId(userId);
     }
-
-
 
 }

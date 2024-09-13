@@ -34,14 +34,8 @@ public class Project {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-
-
-
-
     @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Like> likes;
-
-
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
